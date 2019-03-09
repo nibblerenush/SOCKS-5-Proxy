@@ -4,7 +4,6 @@ project(SOCKS-5-Proxy)
 
 set(sources
   ErrorPrinter.cpp
-  Helper.cpp
   main.cpp
   Socks5Exception.cpp
   Socks5Reply.cpp
@@ -12,20 +11,19 @@ set(sources
   Socks5Request.cpp
   Socks5RequestHandshake.cpp
   Socks5Server.cpp
-  Socks5Session.cpp
+  Socks5SessionBase.cpp
   Socks5Version.cpp
 )
 
 set(headers
   ErrorPrinter.h
-  Helper.h
   Socks5Exception.h
   Socks5Reply.h
   Socks5ReplyHandshake.h
   Socks5Request.h
   Socks5RequestHandshake.h
   Socks5Server.h
-  Socks5Session.h
+  Socks5SessionBase.h
   Socks5Version.h
 )
 

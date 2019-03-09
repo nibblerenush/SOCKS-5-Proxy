@@ -1,4 +1,5 @@
-#pragma once
+#ifndef _SOCKS_5_REPLY_HANDSHAKE_H_
+#define _SOCKS_5_REPLY_HANDSHAKE_H_
 
 #include "Socks5RequestHandshake.h"
 
@@ -15,3 +16,5 @@ namespace socks5
     uint8_t _method;
   };
 }
+
+#endif

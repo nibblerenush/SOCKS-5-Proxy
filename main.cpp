@@ -1,4 +1,3 @@
-#include "Helper.h"
 #include "Socks5Server.h"
 
 #include <cstdlib>
@@ -8,18 +7,17 @@ int main(int argc, char ** argv)
 {
   if (argc != 2)
   {
-    std::cerr << socks5::Helper::GetPrintUsage();
+    std::cerr << "Usage: SOCKS-5-Proxy " << "[configuration file]";
     return EXIT_FAILURE;
-  }
-  else
-  {
-    socks5::Helper::SetFilename(argv[1]);
   }
 
   try
   {
+    boost::property_tree::ptree configurationFile;
+    boost::property_tree::read_ini(argv[1], configurationFile);
+
     boost::asio::io_context io_context;
-    socks5::Socks5Server socks5Server(io_context, socks5::Helper::GetServerPort(), socks5::Helper::GetBufferSize());
+    socks5::Socks5Server socks5Server(io_context, configurationFile);
     io_context.run();
   }
   catch (std::exception & exception)
