@@ -12,6 +12,7 @@ set(sources
   Socks5RequestHandshake.cpp
   Socks5Server.cpp
   Socks5SessionBase.cpp
+  Socks5SessionNoAuthentication.cpp
   Socks5Version.cpp
 )
 
@@ -24,6 +25,7 @@ set(headers
   Socks5RequestHandshake.h
   Socks5Server.h
   Socks5SessionBase.h
+  Socks5SessionNoAuthentication.h
   Socks5Version.h
 )
 

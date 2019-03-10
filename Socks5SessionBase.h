@@ -17,21 +17,21 @@ namespace socks5
     Socks5SessionBase(ba::ip::tcp::socket && socket, uint16_t bufferSize, int sessionId);
     void Start();
   
-  private:
+  protected:
     void ReadSocks5RequestHandshake();
     void WriteSocks5ReplyHandshake();
     virtual void Authenticate() = 0;
-    /*void ReadSocks5Request();
-    void Resolve();
+    void ReadSocks5Request();
+    /*void Resolve();
     void Connect(ba::ip::tcp::resolver::iterator & resolverIterator);
     void WriteSocks5Reply();
     void Read(int direction);
     void Write(int direction, std::size_t length);*/
   
-  private:
+  protected:
     virtual uint8_t GetAuthenticationMethod() const = 0;
 
-  private:
+  protected:
     ba::ip::tcp::socket _inSocket;
     ba::ip::tcp::socket _outSocket;
 
