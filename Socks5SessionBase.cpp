@@ -80,7 +80,7 @@ void socks5::Socks5SessionBase::WriteSocks5ReplyHandshake()
   );
 }
 
-/*void socks5::Socks5SessionBase::ReadSocks5Request()
+void socks5::Socks5SessionBase::ReadSocks5Request()
 {
   auto self(shared_from_this());
   _inSocket.async_receive
@@ -93,13 +93,13 @@ void socks5::Socks5SessionBase::WriteSocks5ReplyHandshake()
         socks5::Socks5Request socks5Request(_socks5RequesåBuff);
         std::cout << socks5Request.ToString();
         
-        Resolve();
+        //Resolve();
       }
     }
   );
 }
 
-void socks5::Socks5SessionBase::Resolve()
+/*void socks5::Socks5SessionBase::Resolve()
 {
   socks5::Socks5Request socks5Request(_socks5RequesåBuff);
   auto self(shared_from_this());
