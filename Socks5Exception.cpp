@@ -5,7 +5,7 @@ socks5::Socks5Exception::Socks5Exception(const std::string & message):
   _message(message)
 {}
 
-const char * socks5::Socks5Exception::what() const
+const char * socks5::Socks5Exception::what() const noexcept
 {
   return _message.c_str();
 }

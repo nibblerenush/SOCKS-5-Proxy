@@ -91,6 +91,7 @@ bool socks5::Socks5Request::CheckCorrectness() const noexcept
   {
     return false;
   }
+  return true;
 }
 
 uint32_t socks5::Socks5Request::GetIpV4Address(const std::vector<uint8_t> & buffer) const

@@ -10,7 +10,7 @@ namespace socks5
   {
   public:
     Socks5Exception(const std::string & message);
-    virtual const char * what() const override;
+    virtual const char * what() const noexcept override;
   private:
     std::string _message;
   };

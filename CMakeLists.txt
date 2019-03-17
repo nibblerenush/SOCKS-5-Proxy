@@ -43,6 +43,7 @@ else()
 endif()
 
 find_package(Boost REQUIRED COMPONENTS system regex date_time)
+find_package(Threads REQUIRED)
 
 if(WIN32)
   add_compile_definitions(_WIN32_WINNT=0x0501)
@@ -55,6 +56,11 @@ if(${Boost_FOUND})
   message("BOOST LIBRARIES: " ${Boost_LIBRARIES})
 endif()
 
+if(${Threads_FOUND})
+  message("CMAKE_THREAD_LIBS_INIT: " ${CMAKE_THREAD_LIBS_INIT})
+endif()
+
 add_executable(${PROJECT_NAME} ${sources} ${headers})
 target_include_directories(${PROJECT_NAME} PRIVATE ${Boost_INCLUDE_DIRS})
-target_link_libraries(${PROJECT_NAME} PRIVATE ${Boost_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} PRIVATE ${Boost_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
+set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 14)
