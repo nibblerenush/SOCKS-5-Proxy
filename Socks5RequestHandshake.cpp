@@ -32,7 +32,7 @@ socks5::Socks5RequestHandshake::Socks5RequestHandshake(const std::vector<uint8_t
   
   if (!CheckCorrectness())
   {
-    throw Socks5Exception("Incorrect format of request handshake");
+    throw Socks5Exception("Incorrect format of socks5 request handshake");
   }
 }
 

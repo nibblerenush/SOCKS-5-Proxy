@@ -7,6 +7,8 @@ namespace socks5
 {
   class Socks5SessionNoAuthentication : public Socks5SessionBase
   {
+  public:
+    Socks5SessionNoAuthentication(ba::ip::tcp::socket && socket, uint16_t bufferSize, int sessionId);
   private:
     void Authenticate() override;
     virtual uint8_t GetAuthenticationMethod() const override;
