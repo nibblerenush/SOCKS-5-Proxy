@@ -1,4 +1,7 @@
 #include "Socks5Request.h"
+#include "Socks5Exception.h"
+#include "Socks5Version.h"
+
 #include <boost/asio.hpp>
 #include <sstream>
 
@@ -22,34 +25,45 @@ const std::map<const uint8_t, const std::string> socks5::Socks5Request::Socks5Re
   {IP_V6_ADDRESS, "IP V6 address"}
 };
 
-socks5::Socks5Request::Socks5Request(const std::vector<uint8_t> & rawData)
+const uint8_t socks5::Socks5Request::MIN_REQUEST_SIZE = 5;
+const uint8_t socks5::Socks5Request::RESERVED_VALUE = 0x00;
+
+socks5::Socks5Request::Socks5Request(const std::vector<uint8_t> & buffer, std::size_t readedLength):
+  _readedLength(readedLength)
 {
   namespace ba = boost::asio;
 
-  _ver = rawData[0];
-  _cmd = rawData[1];
-  _rsv = rawData[2];
-  _atyp = rawData[3];
+  _ver = buffer[0];
+  _cmd = buffer[1];
+  _rsv = buffer[2];
+  _atyp = buffer[3];
 
   switch (_atyp)
   {
   case IP_V4_ADDRESS:
-    _dstAddr = ba::ip::address_v4(GetIpV4Address(rawData)).to_string();
-    _dstPort = std::to_string(GetIpV4Port(rawData));
+    _dstAddr = ba::ip::address_v4(GetIpV4Address(buffer)).to_string();
+    _dstPort = std::to_string(GetIpV4AddressPort(buffer));
     break;
   case DOMAINNAME:
-    _dstAddr = GetDomainName(rawData);
-    _dstPort = std::to_string(GetDomainNamePort(rawData));
+    _dstAddr = GetDomainName(buffer);
+    _dstPort = std::to_string(GetDomainNamePort(buffer));
     break;
   case IP_V6_ADDRESS:
+    // TODO
+    // Реализовать обработку IP_V6_ADDRESS
     break;
+  }
+
+  if (!CheckCorrectness())
+  {
+    throw Socks5Exception("Incorrect format of socks5 request");
   }
 }
 
 std::string socks5::Socks5Request::ToString() const
 {
   std::stringstream result;
-  
+
   result
     << "VER: " << (int)_ver << '\n'
     << "CMD: " << CMD.at(_cmd) << '\n'
@@ -66,33 +80,41 @@ std::string socks5::Socks5Request::GetDstAddr() const
   return _dstAddr;
 }
 
-std::string socks5::Socks5Request::GetPort() const
+std::string socks5::Socks5Request::GetDstPort() const
 {
   return _dstPort;
 }
 
-uint32_t socks5::Socks5Request::GetIpV4Address(const std::vector<uint8_t> & rawData) const
+bool socks5::Socks5Request::CheckCorrectness() const noexcept
 {
-  uint32_t * addressBegin = (uint32_t*)&rawData[4];
-  return ntohl(*addressBegin);
+  if (_ver != Socks5Version::VER || _cmd != CONNECT || _rsv != RESERVED_VALUE || _readedLength < MIN_REQUEST_SIZE)
+  {
+    return false;
+  }
 }
 
-uint16_t socks5::Socks5Request::GetIpV4Port(const std::vector<uint8_t> & rawData) const
+uint32_t socks5::Socks5Request::GetIpV4Address(const std::vector<uint8_t> & buffer) const
 {
-  uint16_t * portBegin = (uint16_t*)&rawData[8];
-  return ntohs(*portBegin);
+  uint32_t * addressBegin = (uint32_t*)&buffer[4];
+  return ::ntohl(*addressBegin);
 }
 
-std::string socks5::Socks5Request::GetDomainName(const std::vector<uint8_t> & rawData) const
+uint16_t socks5::Socks5Request::GetIpV4AddressPort(const std::vector<uint8_t> & buffer) const
 {
-  uint8_t hostLength = rawData[4];
-  std::string hostName((char*)&rawData[5], hostLength);
+  uint16_t * portBegin = (uint16_t*)&buffer[8];
+  return ::ntohs(*portBegin);
+}
+
+std::string socks5::Socks5Request::GetDomainName(const std::vector<uint8_t> & buffer) const
+{
+  uint8_t hostLength = buffer[4];
+  std::string hostName((char*)&buffer[5], hostLength);
   return hostName;
 }
 
-uint16_t socks5::Socks5Request::GetDomainNamePort(const std::vector<uint8_t>& rawData) const
+uint16_t socks5::Socks5Request::GetDomainNamePort(const std::vector<uint8_t>& buffer) const
 {
-  uint8_t hostLength = rawData[4];
-  uint16_t * portBegin = (uint16_t*)&rawData[5 + hostLength];
-  return ntohs(*portBegin);
+  uint8_t hostLength = buffer[4];
+  uint16_t * portBegin = (uint16_t*)&buffer[5 + hostLength];
+  return ::ntohs(*portBegin);
 }

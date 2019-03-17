@@ -39,17 +39,16 @@ void socks5::Socks5SessionBase::ReadSocks5RequestHandshake()
           Socks5RequestHandshake::Method neededMethod = static_cast<Socks5RequestHandshake::Method>(GetAuthenticationMethod());
           socks5::Socks5RequestHandshake socks5RequestHandshake(_socks5RequestHandshakeBuff, readedLength, neededMethod);
           //std::cout << socks5RequestHandshake.ToString() << std::endl;
-          
+
           socks5::Socks5ReplyHandshake socks5ReplyHandshake(socks5RequestHandshake);
-          //std::cout << socks5ReplyHandshake.ToString();
-          
+          //std::cout << socks5ReplyHandshake.ToString() << std::endl;
+
           _socks5ReplyHandshakeBuff = socks5ReplyHandshake.GenerateReplyHandshakeBuffer();
           WriteSocks5ReplyHandshake();
         }
         catch (socks5::Socks5Exception socks5Exception)
         {
           std::cerr << ErrorPrinter::GetErrorPrint(_sessionId, "async_receive(ReadSocks5RequestHandshake)", socks5Exception.what()) << std::endl;
-          return;
         }
       }
       else
@@ -85,37 +84,46 @@ void socks5::Socks5SessionBase::ReadSocks5Request()
   auto self(shared_from_this());
   _inSocket.async_receive
   (
-    ba::buffer(_socks5RequesåBuff, MAX_BUFFER_LENGTH),
-    [this, self](boost::system::error_code error_code, std::size_t length)
+    ba::buffer(_socks5RequestBuff, _socks5RequestBuff.size()),
+    [this, self](boost::system::error_code errorCode, std::size_t readedLength)
     {
-      if (!error_code)
+      if (!errorCode)
       {
-        socks5::Socks5Request socks5Request(_socks5RequesåBuff);
-        std::cout << socks5Request.ToString();
-        
-        //Resolve();
+        try
+        {
+          socks5::Socks5Request socks5Request(_socks5RequestBuff, readedLength);
+          //std::cout << socks5Request.ToString() << std::endl;
+          Resolve(socks5Request.GetDstAddr(), socks5Request.GetDstPort());
+        }
+        catch (socks5::Socks5Exception socks5Exception)
+        {
+          std::cerr << ErrorPrinter::GetErrorPrint(_sessionId, "async_receive(Socks5Request)", socks5Exception.what()) << std::endl;
+        }
+      }
+      else
+      {
+        std::cerr << ErrorPrinter::GetErrorPrint(_sessionId, "async_receive(Socks5Request)", errorCode.message()) << std::endl;
       }
     }
   );
 }
 
-/*void socks5::Socks5SessionBase::Resolve()
+void socks5::Socks5SessionBase::Resolve(std::string dstAddr, std::string dstPort)
 {
-  socks5::Socks5Request socks5Request(_socks5RequesåBuff);
   auto self(shared_from_this());
   _resolver.async_resolve
   (
-    socks5Request.GetDstAddr(),
-    socks5Request.GetPort(),
-    [this, self](boost::system::error_code error_code, ba::ip::tcp::resolver::iterator resolverIterator)
+    dstAddr,
+    dstPort,
+    [this, self](boost::system::error_code errorCode, ba::ip::tcp::resolver::iterator resolverIterator)
     {
-      if (!error_code)
+      if (!errorCode)
       {
         Connect(resolverIterator);
       }
       else
       {
-        std::cerr << error_code.message() << std::endl;
+        std::cerr << ErrorPrinter::GetErrorPrint(_sessionId, "async_resolve", errorCode.message()) << std::endl;
       }
     }
   );
@@ -127,25 +135,22 @@ void socks5::Socks5SessionBase::Connect(ba::ip::tcp::resolver::iterator & resolv
   _outSocket.async_connect
   (
     *resolverIterator,
-    [this, self](boost::system::error_code error_code)
+    [this, self](boost::system::error_code errorCode)
     {
-      if (!error_code)
+      if (!errorCode)
       {
-        std::cout << "connect\n";
-
-        uint32_t realRemoteIp = _outSocket.remote_endpoint().address().to_v4().to_ulong();
-        uint16_t realRemotePort = htons(_outSocket.remote_endpoint().port());
-
-        std::cout << _outSocket.remote_endpoint().address().to_v4() << ':' << realRemotePort << '\n';
+        uint32_t realRemoteIp = ::htonl(_outSocket.remote_endpoint().address().to_v4().to_ulong());
+        uint16_t realRemotePort = ::htons(_outSocket.remote_endpoint().port());
 
         socks5::Socks5Reply socks5Reply(realRemoteIp, realRemotePort);
+        //std::cout << socks5Reply.ToString() << std::endl;
         _socks5ReplyBuff = socks5Reply.GenerateReplyBuffer();
 
         WriteSocks5Reply();
       }
       else
       {
-        std::cerr << error_code.message() << std::endl;
+        std::cerr << ErrorPrinter::GetErrorPrint(_sessionId, "async_connect", errorCode.message()) << std::endl;
       }
     }
   );
@@ -157,93 +162,110 @@ void socks5::Socks5SessionBase::WriteSocks5Reply()
   _inSocket.async_send
   (
     ba::buffer(_socks5ReplyBuff, _socks5ReplyBuff.size()),
-    [this, self](boost::system::error_code error_code, std::size_t length)
+    [this, self](boost::system::error_code errorCode, std::size_t writedLength)
     {
-      if (!error_code)
+      if (!errorCode)
       {
-        Read(3);
+        Read(BOTH);
+      }
+      else
+      {
+        std::cerr << ErrorPrinter::GetErrorPrint(_sessionId, "async_send(Socks5Reply)", errorCode.message()) << std::endl;
       }
     }
   );
 }
 
-void socks5::Socks5SessionBase::Read(int direction)
+void socks5::Socks5SessionBase::Read(Direction direction)
 {
   auto self(shared_from_this());
-
   if (direction & 0x01)
-
   {
     _inSocket.async_receive
     (
       ba::buffer(_inBuffer, _inBuffer.size()),
-      [this, self](boost::system::error_code error_code, std::size_t length)
-    {
-      if (!error_code)
+      [this, self](boost::system::error_code errorCode, std::size_t readedLength)
       {
-        for (int i = 0; i < _inBuffer.size(); ++i)
-          std::cerr << (char)_inBuffer[i];
-        Write(1, length);
+        if (!errorCode)
+        {
+          Write(RECV_FROM_IN_SEND_TO_OUT, readedLength);
+        }
+        else
+        {
+          std::cerr << ErrorPrinter::GetErrorPrint(_sessionId, "async_receive(RECV_FROM_IN_SEND_TO_OUT::Read)", errorCode.message()) << std::endl;
+          CloseSockets();
+        }
       }
-      else
-      {
-        std::string gg = error_code.message();
-        std::cerr << "dsfd" << error_code.message() << std::endl;
-      }
-    }
     );
   }
-
+  
   if (direction & 0x02)
   {
-
-
     _outSocket.async_receive
     (
       ba::buffer(_outBuffer, _outBuffer.size()),
-      [this, self](boost::system::error_code error_code, std::size_t length)
-    {
-      if (!error_code)
+      [this, self](boost::system::error_code errorCode, std::size_t readedLength)
       {
-        Write(2, length);
-
+        if (!errorCode)
+        {
+          Write(RECV_FROM_OUT_SEND_TO_IN, readedLength);
+        }
+        else
+        {
+          std::cerr << ErrorPrinter::GetErrorPrint(_sessionId, "async_receive(RECV_FROM_OUT_SEND_TO_IN::Read)", errorCode.message()) << std::endl;
+          CloseSockets();
+        }
       }
-    }
     );
   }
 }
 
-void socks5::Socks5SessionBase::Write(int direction, std::size_t length)
+void socks5::Socks5SessionBase::Write(Direction direction, std::size_t writeLength)
 {
   auto self(shared_from_this());
-
   switch (direction)
   {
-  case 1:
+  case RECV_FROM_IN_SEND_TO_OUT:
     _outSocket.async_send
     (
-      ba::buffer(_inBuffer, length),
-      [this, self, direction](boost::system::error_code ec, std::size_t length)
+      ba::buffer(_inBuffer, writeLength),
+      [this, self, direction](boost::system::error_code errorCode, std::size_t writedLength)
       {
-        if (!ec)
+        if (!errorCode)
         {
           Read(direction);
+        }
+        else
+        {
+          std::cerr << ErrorPrinter::GetErrorPrint(_sessionId, "async_send(Write)", errorCode.message()) << std::endl;
+          CloseSockets();
         }
       }
     );
     break;
-  case 2:
+  case RECV_FROM_OUT_SEND_TO_IN:
     _inSocket.async_send
     (
-      ba::buffer(_outBuffer, length),
-      [this, self, direction](boost::system::error_code ec, std::size_t length)
+      ba::buffer(_outBuffer, writeLength),
+      [this, self, direction](boost::system::error_code errorCode, std::size_t writedLength)
       {
-        if (!ec)
+        if (!errorCode)
         {
           Read(direction);
+        }
+        else
+        {
+          std::cerr << ErrorPrinter::GetErrorPrint(_sessionId, "async_send(Write)", errorCode.message()) << std::endl;
+          CloseSockets();
         }
       }
     );
     break;
   }
-}*/
+}
+
+void socks5::Socks5SessionBase::CloseSockets()
+{
+  _inSocket.close();
+  _outSocket.close();
+}

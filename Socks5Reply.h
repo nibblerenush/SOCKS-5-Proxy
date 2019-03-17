@@ -1,15 +1,12 @@
-#pragma once
+#ifndef _SOCKS_5_REPLY_H_
+#define _SOCKS_5_REPLY_H_
 
-#include <vector>
+#include "Socks5Request.h"
 
 namespace socks5
 {
   class Socks5Reply
   {
-  public:
-    Socks5Reply(uint32_t realRemoteIp, uint16_t realRemotePort);
-    std::vector<uint8_t> GenerateReplyBuffer() const;
-
   public:
     enum Rep
     {
@@ -24,19 +21,25 @@ namespace socks5
       ADDRESS_TYPE_NOT_SUPPORTED = 0x08
       // From 0x09 to 0xFF unassigned
     };
+  
+  public:
+    Socks5Reply(uint32_t realRemoteIp, uint16_t realRemotePort);
+    std::vector<uint8_t> GenerateReplyBuffer() const;
+    std::string ToString() const;
 
   private:
     uint8_t _ver;
     uint8_t _rep;
     uint8_t _rsv;
     uint8_t _atyp;
-
-    //WARNING
-    /*
-      Пока что используем только IPv4 адрес.
-      Согласно RFC должно работаь Domainname и IPv6.
-    */
+    
     uint32_t _realRemoteIp;
     uint16_t _realRemotePort;
+
+  private:
+    static const uint8_t RESERVED_VALUE;
+    static const uint8_t REPLY_BUFFER_SIZE;
   };
 }
+
+#endif

@@ -13,6 +13,14 @@ namespace socks5
   
   class Socks5SessionBase: public std::enable_shared_from_this<Socks5SessionBase>
   {
+  private:
+    enum Direction
+    {
+      RECV_FROM_IN_SEND_TO_OUT = 0x01,
+      RECV_FROM_OUT_SEND_TO_IN = 0x02,
+      BOTH = 0x03
+    };
+
   public:
     Socks5SessionBase(ba::ip::tcp::socket && socket, uint16_t bufferSize, int sessionId);
     void Start();
@@ -22,14 +30,17 @@ namespace socks5
     void WriteSocks5ReplyHandshake();
     virtual void Authenticate() = 0;
     void ReadSocks5Request();
-    /*void Resolve();
+    void Resolve(std::string _dstAddr, std::string dstPort);
     void Connect(ba::ip::tcp::resolver::iterator & resolverIterator);
     void WriteSocks5Reply();
-    void Read(int direction);
-    void Write(int direction, std::size_t length);*/
+    void Read(Direction direction);
+    void Write(Direction direction, std::size_t writeLength);
   
   protected:
     virtual uint8_t GetAuthenticationMethod() const = 0;
+
+  private:
+    void CloseSockets();
 
   protected:
     ba::ip::tcp::socket _inSocket;
