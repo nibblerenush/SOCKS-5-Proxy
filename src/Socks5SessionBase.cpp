@@ -30,7 +30,7 @@ void socks5::Socks5SessionBase::ReadSocks5RequestHandshake()
   _inSocket.async_receive
   (
     ba::buffer(_socks5RequestHandshakeBuff, _socks5RequestHandshakeBuff.size()),
-    [this, self](boost::system::error_code errorCode, std::size_t readedLength)
+    [this, self](const boost::system::error_code & errorCode, std::size_t readedLength)
     {
       if (!errorCode)
       {
@@ -65,7 +65,7 @@ void socks5::Socks5SessionBase::WriteSocks5ReplyHandshake()
   _inSocket.async_send
   (
     ba::buffer(_socks5ReplyHandshakeBuff, _socks5ReplyHandshakeBuff.size()),
-    [this, self](boost::system::error_code errorCode, std::size_t writedLength)
+    [this, self](const boost::system::error_code & errorCode, std::size_t writedLength)
     {
       if (!errorCode)
       {
@@ -85,7 +85,7 @@ void socks5::Socks5SessionBase::ReadSocks5Request()
   _inSocket.async_receive
   (
     ba::buffer(_socks5RequestBuff, _socks5RequestBuff.size()),
-    [this, self](boost::system::error_code errorCode, std::size_t readedLength)
+    [this, self](const boost::system::error_code & errorCode, std::size_t readedLength)
     {
       if (!errorCode)
       {
@@ -115,11 +115,11 @@ void socks5::Socks5SessionBase::Resolve(std::string dstAddr, std::string dstPort
   (
     dstAddr,
     dstPort,
-    [this, self](boost::system::error_code errorCode, ba::ip::tcp::resolver::iterator resolverIterator)
+    [this, self](const boost::system::error_code & errorCode, ba::ip::tcp::resolver::results_type resultsType)
     {
       if (!errorCode)
       {
-        Connect(resolverIterator);
+        Connect(resultsType);
       }
       else
       {
@@ -129,13 +129,13 @@ void socks5::Socks5SessionBase::Resolve(std::string dstAddr, std::string dstPort
   );
 }
 
-void socks5::Socks5SessionBase::Connect(ba::ip::tcp::resolver::iterator & resolverIterator)
+void socks5::Socks5SessionBase::Connect(const ba::ip::tcp::resolver::results_type & resultsType)
 {
   auto self(shared_from_this());
   _outSocket.async_connect
   (
-    *resolverIterator,
-    [this, self](boost::system::error_code errorCode)
+    resultsType.begin()->endpoint(),
+    [this, self](const boost::system::error_code & errorCode)
     {
       if (!errorCode)
       {
@@ -162,7 +162,7 @@ void socks5::Socks5SessionBase::WriteSocks5Reply()
   _inSocket.async_send
   (
     ba::buffer(_socks5ReplyBuff, _socks5ReplyBuff.size()),
-    [this, self](boost::system::error_code errorCode, std::size_t writedLength)
+    [this, self](const boost::system::error_code & errorCode, std::size_t writedLength)
     {
       if (!errorCode)
       {
@@ -179,12 +179,12 @@ void socks5::Socks5SessionBase::WriteSocks5Reply()
 void socks5::Socks5SessionBase::Read(Direction direction)
 {
   auto self(shared_from_this());
-  if (direction & 0x01)
+  if (direction & RECV_FROM_IN_SEND_TO_OUT)
   {
     _inSocket.async_receive
     (
       ba::buffer(_inBuffer, _inBuffer.size()),
-      [this, self](boost::system::error_code errorCode, std::size_t readedLength)
+      [this, self](const boost::system::error_code & errorCode, std::size_t readedLength)
       {
         if (!errorCode)
         {
@@ -199,12 +199,12 @@ void socks5::Socks5SessionBase::Read(Direction direction)
     );
   }
   
-  if (direction & 0x02)
+  if (direction & RECV_FROM_OUT_SEND_TO_IN)
   {
     _outSocket.async_receive
     (
       ba::buffer(_outBuffer, _outBuffer.size()),
-      [this, self](boost::system::error_code errorCode, std::size_t readedLength)
+      [this, self](const boost::system::error_code & errorCode, std::size_t readedLength)
       {
         if (!errorCode)
         {
@@ -229,7 +229,7 @@ void socks5::Socks5SessionBase::Write(Direction direction, std::size_t writeLeng
     _outSocket.async_send
     (
       ba::buffer(_inBuffer, writeLength),
-      [this, self, direction](boost::system::error_code errorCode, std::size_t writedLength)
+      [this, self, direction](const boost::system::error_code & errorCode, std::size_t writedLength)
       {
         if (!errorCode)
         {
@@ -247,7 +247,7 @@ void socks5::Socks5SessionBase::Write(Direction direction, std::size_t writeLeng
     _inSocket.async_send
     (
       ba::buffer(_outBuffer, writeLength),
-      [this, self, direction](boost::system::error_code errorCode, std::size_t writedLength)
+      [this, self, direction](const boost::system::error_code & errorCode, std::size_t writedLength)
       {
         if (!errorCode)
         {

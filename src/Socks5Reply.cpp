@@ -29,8 +29,8 @@ std::vector<uint8_t> socks5::Socks5Reply::GenerateReplyBuffer() const
   replyBuffer[2] = _rsv;
   replyBuffer[3] = _atyp;
 
-  std::memcpy(&replyBuffer[4], &_realRemoteIp, 4);
-  std::memcpy(&replyBuffer[8], &_realRemotePort, 2);
+  std::memcpy(&replyBuffer[4], &_realRemoteIp, sizeof(_realRemoteIp));
+  std::memcpy(&replyBuffer[8], &_realRemotePort, sizeof(_realRemotePort));
 
   return replyBuffer;
 }

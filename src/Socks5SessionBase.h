@@ -24,18 +24,18 @@ namespace socks5
   public:
     Socks5SessionBase(ba::ip::tcp::socket && socket, uint16_t bufferSize, int sessionId);
     void Start();
-  
+
   protected:
     void ReadSocks5RequestHandshake();
     void WriteSocks5ReplyHandshake();
     virtual void Authenticate() = 0;
     void ReadSocks5Request();
     void Resolve(std::string _dstAddr, std::string dstPort);
-    void Connect(ba::ip::tcp::resolver::iterator & resolverIterator);
+    void Connect(const ba::ip::tcp::resolver::results_type & resultsType);
     void WriteSocks5Reply();
     void Read(Direction direction);
     void Write(Direction direction, std::size_t writeLength);
-  
+
   protected:
     virtual uint8_t GetAuthenticationMethod() const = 0;
 
