@@ -1,6 +1,7 @@
 #include "Socks5SessionFactory.h"
 #include "Socks5Exception.h"
 #include "Socks5SessionNoAuthentication.h"
+#include "Socks5SessionUsernamePassword.h"
 
 socks5::Socks5RequestHandshake::Method socks5::Socks5SessionFactory::_Type = socks5::Socks5RequestHandshake::NO_AUTHENTICATION_REQUIRED;
 
@@ -15,6 +16,8 @@ std::shared_ptr<socks5::Socks5SessionBase> socks5::Socks5SessionFactory::CreateS
   {
   case Socks5RequestHandshake::NO_AUTHENTICATION_REQUIRED:
     return std::make_shared<Socks5SessionNoAuthentication>(std::move(socket), bufferSize, sessionId);
+  case Socks5RequestHandshake::USERNAME_PASSWORD:
+    return std::make_shared<Socks5SessionUsernamePassword>(std::move(socket), bufferSize, sessionId);
   default:
     throw Socks5Exception("Unknown method!");
   }

@@ -8,12 +8,15 @@ set(sources
   Socks5Exception.cpp
   Socks5Reply.cpp
   Socks5ReplyHandshake.cpp
+  Socks5ReplyUsernamePassword.cpp
   Socks5Request.cpp
   Socks5RequestHandshake.cpp
+  Socks5RequestUsernamePassword.cpp
   Socks5Server.cpp
   Socks5SessionBase.cpp
   Socks5SessionFactory.cpp
   Socks5SessionNoAuthentication.cpp
+  Socks5SessionUsernamePassword.cpp
   Socks5Version.cpp
 )
 
@@ -22,12 +25,15 @@ set(headers
   Socks5Exception.h
   Socks5Reply.h
   Socks5ReplyHandshake.h
+  Socks5ReplyUsernamePassword.h
   Socks5Request.h
   Socks5RequestHandshake.h
+  Socks5RequestUsernamePassword.h
   Socks5Server.h
   Socks5SessionBase.h
   Socks5SessionFactory.h
   Socks5SessionNoAuthentication.h
+  Socks5SessionUsernamePassword.h
   Socks5Version.h
 )
 

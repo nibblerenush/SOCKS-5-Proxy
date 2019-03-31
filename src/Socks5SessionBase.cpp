@@ -38,10 +38,10 @@ void socks5::Socks5SessionBase::ReadSocks5RequestHandshake()
         {
           Socks5RequestHandshake::Method neededMethod = static_cast<Socks5RequestHandshake::Method>(GetAuthenticationMethod());
           socks5::Socks5RequestHandshake socks5RequestHandshake(_socks5RequestHandshakeBuff, readedLength, neededMethod);
-          //std::cout << socks5RequestHandshake.ToString() << std::endl;
+          std::cout << socks5RequestHandshake.ToString() << std::endl;
 
           socks5::Socks5ReplyHandshake socks5ReplyHandshake(socks5RequestHandshake);
-          //std::cout << socks5ReplyHandshake.ToString() << std::endl;
+          std::cout << socks5ReplyHandshake.ToString() << std::endl;
 
           _socks5ReplyHandshakeBuff = socks5ReplyHandshake.GenerateReplyHandshakeBuffer();
           WriteSocks5ReplyHandshake();
