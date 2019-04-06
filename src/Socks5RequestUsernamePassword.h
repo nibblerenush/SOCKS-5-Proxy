@@ -12,23 +12,22 @@ namespace socks5
   public:
     Socks5RequestUsernamePassword(const std::vector<uint8_t> & buffer, std::size_t readedLength);
     std::string ToString() const;
-  
+
   private:
     bool CheckCorrectness() const noexcept;
-  
+
   private:
     std::size_t _readedLength;
 
     uint8_t _ver;
     uint8_t _ulen;
-    std::vector<uint8_t> _uname;
-
+    std::string _uname;
     uint8_t _plen;
+    std::string _passwd;
 
-
-    std::vector<uint8_t> _passwd;
-    uint8_t _nmethods;
-    
+  private:
+    static const uint16_t MIN_REQUEST_USERNAME_PASSWORD_SIZE;
+    static const uint16_t MAX_REQUEST_USERNAME_PASSWORD_SIZE;
   };
 }
 

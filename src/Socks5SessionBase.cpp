@@ -37,16 +37,16 @@ void socks5::Socks5SessionBase::ReadSocks5RequestHandshake()
         try
         {
           Socks5RequestHandshake::Method neededMethod = static_cast<Socks5RequestHandshake::Method>(GetAuthenticationMethod());
-          socks5::Socks5RequestHandshake socks5RequestHandshake(_socks5RequestHandshakeBuff, readedLength, neededMethod);
-          std::cout << socks5RequestHandshake.ToString() << std::endl;
+          Socks5RequestHandshake socks5RequestHandshake(_socks5RequestHandshakeBuff, readedLength, neededMethod);
+          //std::cout << socks5RequestHandshake.ToString() << std::endl;
 
-          socks5::Socks5ReplyHandshake socks5ReplyHandshake(socks5RequestHandshake);
-          std::cout << socks5ReplyHandshake.ToString() << std::endl;
+          Socks5ReplyHandshake socks5ReplyHandshake(socks5RequestHandshake);
+          //std::cout << socks5ReplyHandshake.ToString() << std::endl;
 
           _socks5ReplyHandshakeBuff = socks5ReplyHandshake.GenerateReplyHandshakeBuffer();
           WriteSocks5ReplyHandshake();
         }
-        catch (socks5::Socks5Exception socks5Exception)
+        catch (Socks5Exception socks5Exception)
         {
           std::cerr << ErrorPrinter::GetErrorPrint(_sessionId, "async_receive(ReadSocks5RequestHandshake)", socks5Exception.what()) << std::endl;
         }
@@ -91,11 +91,11 @@ void socks5::Socks5SessionBase::ReadSocks5Request()
       {
         try
         {
-          socks5::Socks5Request socks5Request(_socks5RequestBuff, readedLength);
+          Socks5Request socks5Request(_socks5RequestBuff, readedLength);
           //std::cout << socks5Request.ToString() << std::endl;
           Resolve(socks5Request.GetDstAddr(), socks5Request.GetDstPort());
         }
-        catch (socks5::Socks5Exception socks5Exception)
+        catch (Socks5Exception socks5Exception)
         {
           std::cerr << ErrorPrinter::GetErrorPrint(_sessionId, "async_receive(Socks5Request)", socks5Exception.what()) << std::endl;
         }
@@ -142,7 +142,7 @@ void socks5::Socks5SessionBase::Connect(const ba::ip::tcp::resolver::results_typ
         uint32_t realRemoteIp = ::htonl(_outSocket.remote_endpoint().address().to_v4().to_ulong());
         uint16_t realRemotePort = ::htons(_outSocket.remote_endpoint().port());
 
-        socks5::Socks5Reply socks5Reply(realRemoteIp, realRemotePort);
+        Socks5Reply socks5Reply(realRemoteIp, realRemotePort);
         //std::cout << socks5Reply.ToString() << std::endl;
         _socks5ReplyBuff = socks5Reply.GenerateReplyBuffer();
 
@@ -198,7 +198,6 @@ void socks5::Socks5SessionBase::Read(Direction direction)
       }
     );
   }
-  
   if (direction & RECV_FROM_OUT_SEND_TO_IN)
   {
     _outSocket.async_receive

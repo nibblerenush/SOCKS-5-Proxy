@@ -2,6 +2,7 @@
 #include "ErrorPrinter.h"
 #include "Socks5Exception.h"
 #include "Socks5RequestHandshake.h"
+#include "Socks5RequestUsernamePassword.h"
 
 #include <iostream>
 
@@ -27,9 +28,10 @@ void socks5::Socks5SessionUsernamePassword::ReadSocks5RequestUsernamePassword()
       {
         try
         {
-
+          Socks5RequestUsernamePassword socks5RequestUsernamePassword(_socks5RequestUsernamePasswordBuff, readedLength);
+          //std::cout << socks5RequestUsernamePassword.ToString() << std::endl;
         }
-        catch (socks5::Socks5Exception socks5Exception)
+        catch (Socks5Exception socks5Exception)
         {
           std::cerr << ErrorPrinter::GetErrorPrint(_sessionId, "async_receive(ReadSocks5RequestUsernamePassword)", socks5Exception.what()) << std::endl;
         }
@@ -38,7 +40,7 @@ void socks5::Socks5SessionUsernamePassword::ReadSocks5RequestUsernamePassword()
       {
         std::cerr << ErrorPrinter::GetErrorPrint(_sessionId, "async_receive(ReadSocks5RequestUsernamePassword)", errorCode.message()) << std::endl;
       }
-   }
+    }
   );
 }
 
