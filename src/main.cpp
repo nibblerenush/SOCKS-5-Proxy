@@ -1,13 +1,14 @@
-#include "Socks5Server.h"
-
+#include <csignal>
 #include <cstdlib>
 #include <iostream>
+
+#include "Socks5Server.h"
 
 int main(int argc, char ** argv)
 {
   if (argc != 2)
   {
-    std::cerr << "Usage: SOCKS-5-Proxy " << "[configuration file]";
+    std::cerr << "Usage: " << argv[0] << " [configuration file]";
     return EXIT_FAILURE;
   }
 
@@ -16,15 +17,32 @@ int main(int argc, char ** argv)
     boost::property_tree::ptree configurationFile;
     boost::property_tree::read_ini(argv[1], configurationFile);
 
-    boost::asio::io_context io_context;
-    socks5::Socks5Server socks5Server(io_context, configurationFile);
-    io_context.run();
+    boost::asio::io_context ioContext;
+    boost::asio::signal_set signals(ioContext);
+    signals.add(SIGTERM);
+    signals.async_wait
+    (
+      [&ioContext](const boost::system::error_code & errorCode, int signalNumber)
+      {
+        if (!errorCode)
+        {
+          std::cerr << "signalNumber: " << signalNumber << std::endl;
+          ioContext.stop();
+        }
+        else
+        {
+          std::cerr << "errorCode: " << errorCode.message() << std::endl;
+        }
+      }
+    );
+
+    socks5::Socks5Server socks5Server(ioContext, configurationFile);
+    ioContext.run();
   }
-  catch (std::exception & exception)
+  catch (std::exception & ex)
   {
-    std::cerr << exception.what() << std::endl;
+    std::cerr << ex.what() << std::endl;
     return EXIT_FAILURE;
   }
-  
   return EXIT_SUCCESS;
 }

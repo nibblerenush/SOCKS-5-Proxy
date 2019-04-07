@@ -8,7 +8,10 @@ namespace socks5
   class ErrorPrinter
   {
   public:
-    static std::string GetErrorPrint(int sessionId, const std::string & operation, const std::string & message);
+    static std::string GetErrorPrint(
+      int sessionId,
+      const std::string & operation,
+      const std::string & message);
   };
 }
 

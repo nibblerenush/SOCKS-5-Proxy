@@ -48,12 +48,14 @@ void socks5::Socks5SessionUsernamePassword::ReadSocks5RequestUsernamePassword()
               socks5RequestUsernamePassword.GetPassword() == _password)
           {
             Socks5ReplyUsernamePassword socks5ReplyUsernamePassword(SUCCESS);
+            //std::cout << socks5ReplyUsernamePassword.ToString() << std::endl;
             _socks5ReplyUsernamePasswordBuff = socks5ReplyUsernamePassword.GenerateReplyUsernamePasswordBuffer();
             WriteSocks5RequestUsernamePasswordSuccess();
           }
           else
           {
             Socks5ReplyUsernamePassword socks5ReplyUsernamePassword(FAILURE);
+            //std::cout << socks5ReplyUsernamePassword.ToString() << std::endl;
             _socks5ReplyUsernamePasswordBuff = socks5ReplyUsernamePassword.GenerateReplyUsernamePasswordBuffer();
             WriteSocks5RequestUsernamePasswordFailure();
           }

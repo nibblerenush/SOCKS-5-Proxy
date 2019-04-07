@@ -4,7 +4,10 @@
 #include <iomanip>
 #include <sstream>
 
-std::string socks5::ErrorPrinter::GetErrorPrint(int sessionId, const std::string & operation, const std::string & message)
+std::string socks5::ErrorPrinter::GetErrorPrint(
+  int sessionId,
+  const std::string & operation,
+  const std::string & message)
 {
   std::time_t currentTime = std::time(nullptr);
   std::ostringstream result;

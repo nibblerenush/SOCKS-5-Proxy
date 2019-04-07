@@ -14,5 +14,3 @@ namespace socks5
 }
 
 #endif
-
-

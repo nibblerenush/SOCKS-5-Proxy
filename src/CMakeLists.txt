@@ -1,5 +1,4 @@
 cmake_minimum_required(VERSION 3.0.0)
-
 project(SOCKS-5-Proxy)
 
 set(sources
@@ -17,8 +16,7 @@ set(sources
   Socks5SessionFactory.cpp
   Socks5SessionNoAuthentication.cpp
   Socks5SessionUsernamePassword.cpp
-  Socks5Version.cpp
-)
+  Socks5Version.cpp)
 
 set(headers
   ErrorPrinter.h
@@ -34,8 +32,7 @@ set(headers
   Socks5SessionFactory.h
   Socks5SessionNoAuthentication.h
   Socks5SessionUsernamePassword.h
-  Socks5Version.h
-)
+  Socks5Version.h)
 
 set(Boost_USE_STATIC_LIBS ON)
 set(Boost_USE_MULTITHREADED ON)
@@ -67,6 +64,14 @@ if(${Threads_FOUND})
 endif()
 
 add_executable(${PROJECT_NAME} ${sources} ${headers})
-target_include_directories(${PROJECT_NAME} PRIVATE ${Boost_INCLUDE_DIRS})
-target_link_libraries(${PROJECT_NAME} PRIVATE ${Boost_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 14)
+
+target_link_libraries(${PROJECT_NAME}
+  PRIVATE
+  Boost::system
+  Boost::regex
+  Boost::date_time
+  Threads::Threads)
+
+#target_include_directories(${PROJECT_NAME} PRIVATE ${Boost_INCLUDE_DIRS})
+#target_link_libraries(${PROJECT_NAME} PRIVATE ${Boost_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
