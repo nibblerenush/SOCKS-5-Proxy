@@ -3,17 +3,30 @@
 #include "Socks5Exception.h"
 #include "Socks5RequestHandshake.h"
 #include "Socks5RequestUsernamePassword.h"
+#include "Socks5ReplyUsernamePassword.h"
 
 #include <iostream>
 
-socks5::Socks5SessionUsernamePassword::Socks5SessionUsernamePassword(ba::ip::tcp::socket && socket, uint16_t bufferSize, int sessionId) :
+socks5::Socks5SessionUsernamePassword::Socks5SessionUsernamePassword(
+  ba::ip::tcp::socket && socket,
+  const std::string & username,
+  const std::string & password,
+  uint16_t bufferSize,
+  int sessionId):
   Socks5SessionBase(std::move(socket), bufferSize, sessionId),
+  _username(username),
+  _password(password),
   _socks5RequestUsernamePasswordBuff(bufferSize)
 {}
 
 void socks5::Socks5SessionUsernamePassword::Authenticate()
 {
   ReadSocks5RequestUsernamePassword();
+}
+
+uint8_t socks5::Socks5SessionUsernamePassword::GetAuthenticationMethod() const
+{
+  return Socks5RequestHandshake::Method::USERNAME_PASSWORD;
 }
 
 void socks5::Socks5SessionUsernamePassword::ReadSocks5RequestUsernamePassword()
@@ -30,6 +43,20 @@ void socks5::Socks5SessionUsernamePassword::ReadSocks5RequestUsernamePassword()
         {
           Socks5RequestUsernamePassword socks5RequestUsernamePassword(_socks5RequestUsernamePasswordBuff, readedLength);
           //std::cout << socks5RequestUsernamePassword.ToString() << std::endl;
+
+          if (socks5RequestUsernamePassword.GetUsername() == _username &&
+              socks5RequestUsernamePassword.GetPassword() == _password)
+          {
+            Socks5ReplyUsernamePassword socks5ReplyUsernamePassword(SUCCESS);
+            _socks5ReplyUsernamePasswordBuff = socks5ReplyUsernamePassword.GenerateReplyUsernamePasswordBuffer();
+            WriteSocks5RequestUsernamePasswordSuccess();
+          }
+          else
+          {
+            Socks5ReplyUsernamePassword socks5ReplyUsernamePassword(FAILURE);
+            _socks5ReplyUsernamePasswordBuff = socks5ReplyUsernamePassword.GenerateReplyUsernamePasswordBuffer();
+            WriteSocks5RequestUsernamePasswordFailure();
+          }
         }
         catch (Socks5Exception socks5Exception)
         {
@@ -44,11 +71,38 @@ void socks5::Socks5SessionUsernamePassword::ReadSocks5RequestUsernamePassword()
   );
 }
 
-void socks5::Socks5SessionUsernamePassword::WriteSocks5RequestUsernamePassword()
+void socks5::Socks5SessionUsernamePassword::WriteSocks5RequestUsernamePasswordSuccess()
 {
+  auto self(shared_from_this());
+  _inSocket.async_send
+  (
+    ba::buffer(_socks5ReplyUsernamePasswordBuff, _socks5ReplyUsernamePasswordBuff.size()),
+    [this, self](const boost::system::error_code & errorCode, std::size_t writedLength)
+    {
+      if (!errorCode)
+      {
+        ReadSocks5Request();
+      }
+      else
+      {
+        std::cerr << ErrorPrinter::GetErrorPrint(_sessionId, "async_send(WriteSocks5RequestUsernamePasswordSuccess)", errorCode.message()) << std::endl;
+      }
+    }
+  );
 }
 
-uint8_t socks5::Socks5SessionUsernamePassword::GetAuthenticationMethod() const
+void socks5::Socks5SessionUsernamePassword::WriteSocks5RequestUsernamePasswordFailure()
 {
-  return Socks5RequestHandshake::Method::USERNAME_PASSWORD;
+  auto self(shared_from_this());
+  _inSocket.async_send
+  (
+    ba::buffer(_socks5ReplyUsernamePasswordBuff, _socks5ReplyUsernamePasswordBuff.size()),
+    [this, self](const boost::system::error_code & errorCode, std::size_t writedLength)
+    {
+      if (errorCode)
+      {
+        std::cerr << ErrorPrinter::GetErrorPrint(_sessionId, "async_send(WriteSocks5RequestUsernamePasswordFailure)", errorCode.message()) << std::endl;
+      }
+    }
+  );
 }

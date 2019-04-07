@@ -4,6 +4,9 @@
 
 #include <sstream>
 
+const uint16_t socks5::Socks5RequestUsernamePassword::MIN_REQUEST_USERNAME_PASSWORD_SIZE = 5;
+const uint16_t socks5::Socks5RequestUsernamePassword::MAX_REQUEST_USERNAME_PASSWORD_SIZE = 513;
+
 socks5::Socks5RequestUsernamePassword::Socks5RequestUsernamePassword(const std::vector<uint8_t> & buffer, std::size_t readedLength):
   _readedLength(readedLength)
 {
@@ -21,10 +24,10 @@ socks5::Socks5RequestUsernamePassword::Socks5RequestUsernamePassword(const std::
     _passwd[passwd_index] = buffer[3 + _ulen + passwd_index];
   }
   
-  /*if (!CheckCorrectness())
+  if (!CheckCorrectness())
   {
     throw Socks5Exception("Incorrect format of socks5 request username password");
-  }*/
+  }
 }
 
 std::string socks5::Socks5RequestUsernamePassword::ToString() const
@@ -39,6 +42,23 @@ std::string socks5::Socks5RequestUsernamePassword::ToString() const
   return result.str();
 }
 
+std::string socks5::Socks5RequestUsernamePassword::GetUsername() const
+{
+  return _uname;
+}
 
+std::string socks5::Socks5RequestUsernamePassword::GetPassword() const
+{
+  return _passwd;
+}
 
-
+bool socks5::Socks5RequestUsernamePassword::CheckCorrectness() const noexcept
+{
+  if (_ver != Socks5Version::USERNAME_PASSWORD_VER ||
+      _readedLength < MIN_REQUEST_USERNAME_PASSWORD_SIZE ||
+      _readedLength > MAX_REQUEST_USERNAME_PASSWORD_SIZE)
+  {
+    return false;
+  }
+  return true;
+}

@@ -2,8 +2,8 @@
 #define _SOCKS_5_SERVER_H_
 
 #include <cstdint>
-#include <boost/asio.hpp>
 
+#include <boost/asio.hpp>
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/ini_parser.hpp>
 
@@ -21,12 +21,9 @@ namespace socks5
   private:
     const bpt::ptree & _configurationFile;
     ba::ip::tcp::acceptor _acceptor;
-    uint16_t _bufferSize;
     int _sessionIdCounter;
-
   private:
     static const uint16_t DEFAULT_SERVER_PORT;
-    static const uint16_t DEFAULT_BUFFER_SIZE;
     static const uint8_t DEFAULT_AUTHENTICATION_METHOD;
   };
 }

@@ -9,6 +9,7 @@ namespace socks5
   {
   public:
     static const uint8_t VER;
+    static const uint8_t USERNAME_PASSWORD_VER;
   };
 }
 

@@ -12,6 +12,8 @@ namespace socks5
   public:
     Socks5RequestUsernamePassword(const std::vector<uint8_t> & buffer, std::size_t readedLength);
     std::string ToString() const;
+    std::string GetUsername() const;
+    std::string GetPassword() const;
 
   private:
     bool CheckCorrectness() const noexcept;
