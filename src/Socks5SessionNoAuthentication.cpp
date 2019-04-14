@@ -1,15 +1,17 @@
 #include "Socks5SessionNoAuthentication.h"
 #include "Socks5RequestHandshake.h"
 
-socks5::Socks5SessionNoAuthentication::Socks5SessionNoAuthentication(ba::ip::tcp::socket && socket, uint16_t bufferSize, int sessionId):
+socks5::Socks5SessionNoAuthentication::Socks5SessionNoAuthentication(
+  ba::ip::tcp::socket && socket,
+  uint16_t bufferSize,
+  int sessionId):
   Socks5SessionBase(std::move(socket), bufferSize, sessionId)
-{
-}
+{}
 
 void socks5::Socks5SessionNoAuthentication::Authenticate()
 {
-  // Так как аутентификация не трубуется, то просто
-  // вызываем функцию чтения SOCKS5 запроса
+  // РўР°Рє РєР°Рє Р°СѓС‚РµРЅС‚РёС„РёРєР°С†РёСЏ РЅРµ С‚СЂСѓР±СѓРµС‚СЃСЏ, С‚Рѕ РїСЂРѕСЃС‚Рѕ
+  // РІС‹Р·С‹РІР°РµРј С„СѓРЅРєС†РёСЋ С‡С‚РµРЅРёСЏ SOCKS5 Р·Р°РїСЂРѕСЃР°
   ReadSocks5Request();
 }
 

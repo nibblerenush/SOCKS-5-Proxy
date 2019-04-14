@@ -14,8 +14,7 @@ void socks5::Socks5SessionFactory::SetType(Socks5RequestHandshake::Method Type)
 std::shared_ptr<socks5::Socks5SessionBase> socks5::Socks5SessionFactory::CreateSession(
   ba::ip::tcp::socket && socket,
   const bpt::ptree & configurationFile,
-  int sessionId
-)
+  int sessionId)
 {
   switch (_Type)
   {

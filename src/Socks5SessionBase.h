@@ -22,7 +22,10 @@ namespace socks5
     };
 
   public:
-    Socks5SessionBase(ba::ip::tcp::socket && socket, uint16_t bufferSize, int sessionId);
+    Socks5SessionBase(
+      ba::ip::tcp::socket && socket,
+      uint16_t bufferSize,
+      int sessionId);
     void Start();
 
   protected:

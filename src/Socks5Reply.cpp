@@ -15,7 +15,7 @@ socks5::Socks5Reply::Socks5Reply(uint32_t realRemoteIp, uint16_t realRemotePort)
   _atyp = Socks5Request::IP_V4_ADDRESS;
 
   // TODO
-  // Реализовать DOMAINNAME и IP_V6_ADDRESS
+  // Р РµР°Р»РёР·РѕРІР°С‚СЊ DOMAINNAME Рё IP_V6_ADDRESS
   _realRemoteIp = realRemoteIp;
   _realRemotePort = realRemotePort;
 }
@@ -38,7 +38,7 @@ std::vector<uint8_t> socks5::Socks5Reply::GenerateReplyBuffer() const
 std::string socks5::Socks5Reply::ToString() const
 {
   // TODO
-  // Доделать строковый вывод
+  // Р”РѕРґРµР»Р°С‚СЊ СЃС‚СЂРѕРєРѕРІС‹Р№ РІС‹РІРѕРґ
   std::stringstream result;
 
   result

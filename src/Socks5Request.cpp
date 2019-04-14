@@ -50,7 +50,7 @@ socks5::Socks5Request::Socks5Request(const std::vector<uint8_t> & buffer, std::s
     break;
   case IP_V6_ADDRESS:
     // TODO
-    // Реализовать обработку IP_V6_ADDRESS
+    // Р РµР°Р»РёР·РѕРІР°С‚СЊ РѕР±СЂР°Р±РѕС‚РєСѓ IP_V6_ADDRESS
     break;
   }
 

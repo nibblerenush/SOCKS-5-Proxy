@@ -8,7 +8,10 @@
 
 #include <iostream>
 
-socks5::Socks5SessionBase::Socks5SessionBase(ba::ip::tcp::socket && socket, uint16_t bufferSize, int sessionId):
+socks5::Socks5SessionBase::Socks5SessionBase(
+  ba::ip::tcp::socket && socket,
+  uint16_t bufferSize,
+  int sessionId):
   _inSocket(std::move(socket)),
   _outSocket(_inSocket.get_io_context()),
   _socks5RequestHandshakeBuff(bufferSize),
