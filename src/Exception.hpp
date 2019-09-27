@@ -1,19 +1,16 @@
-#ifndef _SOCKS_5_EXCEPTION_H_
-#define _SOCKS_5_EXCEPTION_H_
+#pragma once
 
 #include <stdexcept>
 #include <string>
 
 namespace socks5
 {
-  class Socks5Exception : public std::exception
+  class Exception: public std::exception
   {
   public:
-    Socks5Exception(const std::string & message);
+    Exception(const std::string & message);
     virtual const char * what() const noexcept override;
   private:
     std::string _message;
   };
 }
-
-#endif

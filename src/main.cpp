@@ -2,11 +2,11 @@
 #include <cstdlib>
 #include <iostream>
 
-#include "Socks5Server.h"
+#include "Server.hpp"
 
 int main(int argc, char ** argv)
 {
-  if (argc != 2)
+  /*if (argc != 2)
   {
     std::cerr << "Usage: " << argv[0] << " [configuration file]";
     return EXIT_FAILURE;
@@ -43,6 +43,23 @@ int main(int argc, char ** argv)
   {
     std::cerr << ex.what() << std::endl;
     return EXIT_FAILURE;
+  }*/
+
+  try
+  {
+    boost::asio::io_context ioContext;
+    socks5::Server{ioContext}();
+    ioContext.run();
   }
+  catch (std::exception & ex)
+  {
+    std::cerr << ex.what() << std::endl;
+  }
+  
+
+
   return EXIT_SUCCESS;
+
+
+
 }
