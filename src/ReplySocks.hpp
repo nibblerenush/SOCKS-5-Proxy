@@ -6,7 +6,7 @@
 
 namespace socks5
 {
-  enum Rep
+  enum Rep : uint8_t
   {
     SUCCEEDED = 0x00,
     GENERAL_SOCKS_SERVER_FAILURE = 0x01,
@@ -20,20 +20,20 @@ namespace socks5
     // From 0x09 to 0xFF unassigned
   };
   
-  class Reply
+  class ReplySocks
   {
   public:
-    Reply(uint32_t realRemoteIp, uint16_t realRemotePort);
+    ReplySocks(uint32_t bndAddr, uint16_t bndPort);
     std::vector<uint8_t> GenBuff() const;
     std::string ToString() const;
-
+    
   private:
     uint8_t _ver;
     uint8_t _rep;
     uint8_t _rsv;
     uint8_t _atyp;
     
-    uint32_t _realRemoteIp;
-    uint16_t _realRemotePort;
+    uint32_t _bndAddr;
+    uint16_t _bndPort;
   };
 }

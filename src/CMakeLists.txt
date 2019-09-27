@@ -4,8 +4,8 @@ project(SOCKS-5-Proxy)
 set(sources
 Exception.cpp
 RequestHandshake.cpp
-Request.cpp
-Reply.cpp
+RequestSocks.cpp
+ReplySocks.cpp
 ReplyHandshake.cpp
 Server.cpp
 main.cpp
@@ -31,8 +31,8 @@ main.cpp
 set(headers
 Exception.hpp
 RequestHandshake.hpp
-Request.hpp
-Reply.hpp
+RequestSocks.hpp
+ReplySocks.hpp
 ReplyHandshake.hpp
 Version.hpp
 Server.hpp)

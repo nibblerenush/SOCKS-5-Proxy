@@ -11,13 +11,13 @@ namespace socks5
 
   class RequestHandshake;
   class ReplyHandshake;
-  class Request;
-  class Reply;
+  class RequestSocks;
+  class ReplySocks;
 
   class Server
   {
   public:
-    Server(ba::io_context & io_context);
+    explicit Server(ba::io_context & io_context);
     void operator()(bs::error_code ec = bs::error_code{}, std::size_t length = 0);
     void operator()(bs::error_code ec, ba::ip::tcp::resolver::results_type results);
     
@@ -26,20 +26,21 @@ namespace socks5
     static const std::size_t TEMP_BUFFER_SIZE{512};
 
   private:
-    ba::coroutine coro1;
-    ba::coroutine coro2;
+    ba::coroutine _majorCoro;
+    ba::coroutine _minorCoro;
+    ba::ip::tcp::endpoint _serverEndpoint;
 
-    std::shared_ptr<ba::ip::tcp::acceptor> _acceptor;
-    std::shared_ptr<ba::ip::tcp::resolver> _resolver;
-    std::shared_ptr<ba::ip::tcp::socket> _fromLocalSock;
-    std::shared_ptr<ba::ip::tcp::socket> _fromRemoteSock;
-    std::shared_ptr<std::vector<uint8_t>> _fromLocalBuff;
-    std::shared_ptr<std::vector<uint8_t>> _fromRemoteBuff;
-    std::shared_ptr<std::vector<uint8_t>> _buffer;
+    std::shared_ptr<ba::ip::tcp::acceptor> _acceptor{nullptr};
+    std::shared_ptr<ba::ip::tcp::resolver> _resolver{nullptr};
+    std::shared_ptr<ba::ip::tcp::socket> _localSock{nullptr};
+    std::shared_ptr<ba::ip::tcp::socket> _remoteSock{nullptr};
+    std::shared_ptr<std::array<uint8_t, BUFFER_SIZE>> _localBuff{nullptr};
+    std::shared_ptr<std::array<uint8_t, BUFFER_SIZE>> _remoteBuff{nullptr};
+    std::shared_ptr<std::vector<uint8_t>> _tempBuff{nullptr};
 
-    std::shared_ptr<RequestHandshake> _requestHandshake;
-    std::shared_ptr<ReplyHandshake> _replyHandshake;
-    std::shared_ptr<Request> _request;
-    std::shared_ptr<Reply> _reply;
+    std::shared_ptr<RequestHandshake> _requestHandshake{nullptr};
+    std::shared_ptr<ReplyHandshake> _replyHandshake{nullptr};
+    std::shared_ptr<RequestSocks> _requestSocks{nullptr};
+    std::shared_ptr<ReplySocks> _replySocks{nullptr};
   };
 }

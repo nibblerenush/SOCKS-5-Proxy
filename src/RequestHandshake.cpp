@@ -3,10 +3,9 @@
 #include "Version.hpp"
 
 #include <algorithm>
+#include <map>
 #include <sstream>
 #include <typeinfo>
-
-#include <iostream>
 
 namespace socks5
 {
@@ -42,7 +41,7 @@ namespace socks5
       throw Exception("Incorrect format of socks5 request handshake");
     }
   }
-
+  
   std::string RequestHandshake::ToString() const
   {
     std::stringstream result;
