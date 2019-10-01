@@ -17,7 +17,7 @@ namespace socks5
   class Server
   {
   public:
-    explicit Server(ba::io_context & io_context);
+    explicit Server(ba::io_context & io_context, const std::string & filename);
     void operator()(bs::error_code ec = bs::error_code{}, std::size_t length = 0);
     void operator()(bs::error_code ec, ba::ip::tcp::resolver::results_type results);
     

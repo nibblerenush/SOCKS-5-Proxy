@@ -1,21 +1,19 @@
 #include "Server.hpp"
+#include "Settings.hpp"
 #include "RequestHandshake.hpp"
 #include "ReplyHandshake.hpp"
 #include "RequestSocks.hpp"
 #include "ReplySocks.hpp"
 #include "Exception.hpp"
 
-#define BOOST_LOG_DYN_LINK 1
-#include <boost/log/trivial.hpp>
-
 #include <iostream>
 
 namespace socks5
 {
-  Server::Server(ba::io_context & io_context):
+  Server::Server(ba::io_context & io_context, const std::string & filename):
   _majorCoro{},
   _minorCoro{},
-  _serverEndpoint{ba::ip::tcp::v4(), 11080}
+  _serverEndpoint{ba::ip::tcp::v4(), Settings::Inst(filename).Port()}
   {  
     _acceptor.reset(new ba::ip::tcp::acceptor{io_context, _serverEndpoint});
   }
@@ -42,25 +40,25 @@ namespace socks5
 
         // ==================== Request/Reply Handshake ====================
         yield _localSock->async_receive(ba::buffer(*_tempBuff), *this);
-        _requestHandshake.reset(new RequestHandshake{*_tempBuff, length, NO_AUTHENTICATION_REQUIRED});
-        BOOST_LOG_TRIVIAL(info) << _requestHandshake->ToString();
+        _requestHandshake.reset(new RequestHandshake{*_tempBuff, length, static_cast<Method>(Settings::Inst().AuthMethod())});
         
-        _replyHandshake.reset(new ReplyHandshake{NO_AUTHENTICATION_REQUIRED});
+        _replyHandshake.reset(new ReplyHandshake{static_cast<Method>(Settings::Inst().AuthMethod())});
         yield _localSock->async_send(ba::buffer(_replyHandshake->GenBuff()), *this);
-        BOOST_LOG_TRIVIAL(info) << _replyHandshake->ToString();
         // ==================== Request/Reply Handshake ====================
+
+        // ==================== Authentication ====================
+        //
+        // ==================== Authentication ====================
 
         // ==================== Request/Reply Socks ====================
         yield _localSock->async_receive(ba::buffer(*_tempBuff), *this);
         _requestSocks.reset(new RequestSocks{*_tempBuff, length});
-        BOOST_LOG_TRIVIAL(info) << _requestSocks->ToString();
         
         _resolver.reset(new ba::ip::tcp::resolver{_acceptor->get_io_context()});
         yield _resolver->async_resolve(_requestSocks->DstAddr(), _requestSocks->DstPort(), *this);
 
         _replySocks.reset(new ReplySocks{_serverEndpoint.address().to_v4().to_uint(), _serverEndpoint.port()});
         yield _localSock->async_send(ba::buffer(_replySocks->GenBuff()), *this);
-        BOOST_LOG_TRIVIAL(info) << _replySocks->ToString();
         // ==================== Request/Reply Socks ====================
         
         _localBuff.reset(new std::array<uint8_t, BUFFER_SIZE>());
@@ -98,8 +96,6 @@ namespace socks5
     {
       reenter(_minorCoro)
       {
-        //std::cout << results.begin()->endpoint().address().to_string() << std::endl;
-
         _remoteSock.reset(new ba::ip::tcp::socket{_acceptor->get_io_context()});
         
         yield _remoteSock->async_connect(results.begin()->endpoint(), *this);

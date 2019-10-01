@@ -6,11 +6,11 @@
 
 int main(int argc, char ** argv)
 {
-  /*if (argc != 2)
+  if (argc != 2)
   {
-    std::cerr << "Usage: " << argv[0] << " [configuration file]";
+    std::cerr << "Usage: " << argv[0] << " [configuration file]" << std::endl;
     return EXIT_FAILURE;
-  }*/
+  }
 
   boost::asio::io_context ioContext;
   boost::asio::signal_set signals{ioContext};
@@ -21,7 +21,7 @@ int main(int argc, char ** argv)
     {
       if (!ec)
       {
-        std::cerr << "Signal number: " << signalNumber << std::endl;
+        std::cout << "Signal number: " << signalNumber << std::endl;
         ioContext.stop();
       }
       else
@@ -30,8 +30,8 @@ int main(int argc, char ** argv)
       }
     }
   );
-
-  socks5::Server{ioContext}();
+  
+  socks5::Server{ioContext, argv[1]}();
   ioContext.run();
   return EXIT_SUCCESS;
 }

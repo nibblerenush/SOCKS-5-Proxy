@@ -2,58 +2,26 @@ cmake_minimum_required(VERSION 3.0.0)
 project(SOCKS-5-Proxy)
 
 set(sources
-Exception.cpp
-RequestHandshake.cpp
-RequestSocks.cpp
-ReplySocks.cpp
-ReplyHandshake.cpp
-Server.cpp
-main.cpp
-)
+  Exception.cpp
+  ReplyHandshake.cpp
+  ReplySocks.cpp
+  RequestHandshake.cpp
+  RequestSocks.cpp
+  Server.cpp
+  Settings.cpp
+  main.cpp)
 
-# set(sources
-#   ErrorPrinter.cpp
-#   main.cpp
-#   Socks5Exception.cpp
-#   Socks5Reply.cpp
-#   Socks5ReplyHandshake.cpp
-#   Socks5ReplyUsernamePassword.cpp
-#   Socks5Request.cpp
-#   Socks5RequestHandshake.cpp
-#   Socks5RequestUsernamePassword.cpp
-#   Socks5Server.cpp
-#   Socks5SessionBase.cpp
-#   Socks5SessionFactory.cpp
-#   Socks5SessionNoAuthentication.cpp
-#   Socks5SessionUsernamePassword.cpp
-#   Socks5Version.cpp)
 
 set(headers
-Exception.hpp
-RequestHandshake.hpp
-RequestSocks.hpp
-ReplySocks.hpp
-ReplyHandshake.hpp
-Version.hpp
-Server.hpp)
+  Exception.hpp
+  ReplyHandshake.hpp
+  ReplySocks.hpp
+  RequestHandshake.hpp
+  RequestSocks.hpp
+  Server.hpp
+  Settings.hpp
+  Version.hpp)
 
-# set(headers
-#   ErrorPrinter.h
-#   Socks5Exception.h
-#   Socks5Reply.h
-#   Socks5ReplyHandshake.h
-#   Socks5ReplyUsernamePassword.h
-#   Socks5Request.h
-#   Socks5RequestHandshake.h
-#   Socks5RequestUsernamePassword.h
-#   Socks5Server.h
-#   Socks5SessionBase.h
-#   Socks5SessionFactory.h
-#   Socks5SessionNoAuthentication.h
-#   Socks5SessionUsernamePassword.h
-#   Socks5Version.h)
-
-set(Boost_USE_STATIC_LIBS OFF)
 set(Boost_USE_MULTITHREADED ON)
 
 if(CMAKE_BUILD_TYPE MATCHES Debug)
@@ -66,10 +34,6 @@ endif()
 
 find_package(Boost REQUIRED COMPONENTS system regex date_time log)
 find_package(Threads REQUIRED)
-
-if(WIN32)
-  add_compile_definitions(_WIN32_WINNT=0x0501)
-endif()
 
 if(${Boost_FOUND})
   message("BOOST VERSION: " ${Boost_VERSION})
@@ -92,6 +56,8 @@ target_link_libraries(${PROJECT_NAME}
   Boost::date_time
   Boost::log
   Threads::Threads)
-
-#target_include_directories(${PROJECT_NAME} PRIVATE ${Boost_INCLUDE_DIRS})
-#target_link_libraries(${PROJECT_NAME} PRIVATE ${Boost_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
+  
+target_compile_definitions(${PROJECT_NAME} PRIVATE BOOST_LOG_DYN_LINK=1)
+if(WIN32)
+  target_compile_definitions(${PROJECT_NAME} PRIVATE _WIN32_WINNT=0x0501)
+endif()

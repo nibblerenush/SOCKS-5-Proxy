@@ -7,6 +7,7 @@
 #include <typeinfo>
 
 #include <boost/asio.hpp>
+#include <boost/log/trivial.hpp>
 
 #ifdef WIN32
   #include <Windows.h>
@@ -54,6 +55,8 @@ namespace socks5
     {
       throw Exception("Incorrect format of socks5 request");
     }
+
+    BOOST_LOG_TRIVIAL(info) << ToString();
   }
   
   std::string RequestSocks::ToString() const

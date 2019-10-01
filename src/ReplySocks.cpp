@@ -7,6 +7,7 @@
 #include <typeinfo>
 
 #include <boost/asio.hpp>
+#include <boost/log/trivial.hpp>
 
 #ifdef WIN32
   #include <Windows.h>
@@ -31,7 +32,9 @@ namespace socks5
   _atyp{IP_V4_ADDRESS},
   _bndAddr{bndAddr},
   _bndPort{bndPort}
-  {}
+  {
+    BOOST_LOG_TRIVIAL(info) << ToString();
+  }
 
   std::vector<uint8_t> ReplySocks::GenBuff() const
   {

@@ -4,12 +4,16 @@
 #include <sstream>
 #include <typeinfo>
 
+#include <boost/log/trivial.hpp>
+
 namespace socks5
 {
   ReplyHandshake::ReplyHandshake(Method neededMethod)
   {
     _ver = VER;
     _method = neededMethod;
+
+    BOOST_LOG_TRIVIAL(info) << ToString();
   }
   
   std::vector<uint8_t> ReplyHandshake::GenBuff() const

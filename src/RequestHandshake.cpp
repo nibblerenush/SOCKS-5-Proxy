@@ -7,6 +7,8 @@
 #include <sstream>
 #include <typeinfo>
 
+#include <boost/log/trivial.hpp>
+
 namespace socks5
 {
   static const std::map<uint8_t, std::string> METHODS =
@@ -40,6 +42,8 @@ namespace socks5
     {
       throw Exception("Incorrect format of socks5 request handshake");
     }
+
+    BOOST_LOG_TRIVIAL(info) << ToString();
   }
   
   std::string RequestHandshake::ToString() const
