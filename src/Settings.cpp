@@ -27,4 +27,14 @@ namespace socks5
     boost::optional<uint8_t> authMethod = _tree.get_optional<uint8_t>("server.authentication_method");
     return authMethod ? authMethod.value() : DEFAULT_AUTHENTICATION_METHOD;
   }
+  
+  std::string Settings::Uname() const
+  {
+    return _tree.get<std::string>("auth.uname");
+  }
+  
+  std::string Settings::Passwd() const
+  {
+    return _tree.get<std::string>("auth.passwd");
+  }
 }

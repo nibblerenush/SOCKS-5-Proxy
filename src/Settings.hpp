@@ -15,6 +15,8 @@ namespace socks5
     static Settings & Inst(const std::string & filename = std::string{});
     uint16_t Port() const;
     uint8_t AuthMethod() const;
+    std::string Uname() const;
+    std::string Passwd() const;
 
   private:
     explicit Settings() = default;

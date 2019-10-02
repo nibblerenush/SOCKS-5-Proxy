@@ -5,19 +5,22 @@ set(sources
   Exception.cpp
   ReplyHandshake.cpp
   ReplySocks.cpp
+  ReplyUnamePasswd.cpp
   RequestHandshake.cpp
   RequestSocks.cpp
+  RequestUnamePasswd.cpp
   Server.cpp
   Settings.cpp
   main.cpp)
-
 
 set(headers
   Exception.hpp
   ReplyHandshake.hpp
   ReplySocks.hpp
+  ReplyUnamePasswd.hpp
   RequestHandshake.hpp
   RequestSocks.hpp
+  RequestUnamePasswd.hpp
   Server.hpp
   Settings.hpp
   Version.hpp)
@@ -56,7 +59,7 @@ target_link_libraries(${PROJECT_NAME}
   Boost::date_time
   Boost::log
   Threads::Threads)
-  
+
 target_compile_definitions(${PROJECT_NAME} PRIVATE BOOST_LOG_DYN_LINK=1)
 if(WIN32)
   target_compile_definitions(${PROJECT_NAME} PRIVATE _WIN32_WINNT=0x0501)

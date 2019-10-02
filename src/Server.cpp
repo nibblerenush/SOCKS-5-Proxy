@@ -4,12 +4,17 @@
 #include "ReplyHandshake.hpp"
 #include "RequestSocks.hpp"
 #include "ReplySocks.hpp"
+#include "RequestUnamePasswd.hpp"
+#include "ReplyUnamePasswd.hpp"
 #include "Exception.hpp"
 
 #include <iostream>
 
 namespace socks5
 {
+  static const uint8_t UNAME_PASSWD_SUCCESS = 0;
+  static const uint8_t UNAME_PASSWD_FAILURE = 1;
+
   Server::Server(ba::io_context & io_context, const std::string & filename):
   _majorCoro{},
   _minorCoro{},
@@ -47,7 +52,25 @@ namespace socks5
         // ==================== Request/Reply Handshake ====================
 
         // ==================== Authentication ====================
-        //
+        if (static_cast<Method>(Settings::Inst().AuthMethod()) == USERNAME_PASSWORD)
+        {
+          yield _localSock->async_receive(ba::buffer(*_tempBuff), *this);
+          _requestUnamePasswd.reset(new RequestUnamePasswd{*_tempBuff, length});
+          
+          if (_requestUnamePasswd->Uname() == Settings::Inst().Uname() && _requestUnamePasswd->Passwd() == Settings::Inst().Passwd())
+          {
+            _replyUnamePasswd.reset(new ReplyUnamePasswd{UNAME_PASSWD_SUCCESS});
+            yield _localSock->async_send(ba::buffer(_replyUnamePasswd->GenBuff()), *this);
+          }
+          else
+          {
+            _replyUnamePasswd.reset(new ReplyUnamePasswd{UNAME_PASSWD_FAILURE});
+            yield _localSock->async_send(ba::buffer(_replyUnamePasswd->GenBuff()), *this);
+            _localSock->close();
+            _localSock.reset();
+            yield break;
+          }
+        }
         // ==================== Authentication ====================
 
         // ==================== Request/Reply Socks ====================
@@ -87,6 +110,18 @@ namespace socks5
     else
     {
       std::cerr << __FILE__ << ": "<< __LINE__ << ": " << ec.message() << std::endl;
+
+      if (_localSock)
+      {
+        _localSock->close();
+        _localSock.reset();
+      }
+
+      if (_remoteSock)
+      {
+        _remoteSock->close();
+        _remoteSock.reset();
+      }
     }
   }
   
@@ -104,6 +139,18 @@ namespace socks5
     else
     {
       std::cerr << __FILE__ << ": "<< __LINE__ << ": " << ec.message() << std::endl;
+      
+      if (_localSock)
+      {
+        _localSock->close();
+        _localSock.reset();
+      }
+
+      if (_remoteSock)
+      {
+        _remoteSock->close();
+        _remoteSock.reset();
+      }
     }
   }
 

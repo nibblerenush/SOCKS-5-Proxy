@@ -1,0 +1,12 @@
+{
+  "server":
+  {
+    "port": 11080,
+    "authentication_method": 2
+  },
+  "auth":
+  {
+    "uname": "test_uname",
+    "passwd": "test_passwd"
+  }
+}

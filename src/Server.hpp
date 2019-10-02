@@ -13,6 +13,8 @@ namespace socks5
   class ReplyHandshake;
   class RequestSocks;
   class ReplySocks;
+  class RequestUnamePasswd;
+  class ReplyUnamePasswd;
 
   class Server
   {
@@ -42,5 +44,7 @@ namespace socks5
     std::shared_ptr<ReplyHandshake> _replyHandshake{nullptr};
     std::shared_ptr<RequestSocks> _requestSocks{nullptr};
     std::shared_ptr<ReplySocks> _replySocks{nullptr};
+    std::shared_ptr<RequestUnamePasswd> _requestUnamePasswd{nullptr};
+    std::shared_ptr<ReplyUnamePasswd> _replyUnamePasswd{nullptr};
   };
 }
