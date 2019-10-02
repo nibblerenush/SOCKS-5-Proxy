@@ -1,3 +1,4 @@
-.vs/
-build/
+.vs
+.vscode
 CMakeSettings.json
+src/build
