@@ -35,7 +35,7 @@ namespace socks5
         {
           do
           {
-            _localSock.reset(new ba::ip::tcp::socket{_acceptor->get_io_context()});
+            _localSock.reset(new ba::ip::tcp::socket{_acceptor->get_executor()});
             
             yield _acceptor->async_accept(*_localSock, *this);
 
@@ -50,7 +50,8 @@ namespace socks5
           _requestHandshake.reset(new RequestHandshake{*_tempBuff, length, static_cast<Method>(Settings::Inst().AuthMethod())});
           
           _replyHandshake.reset(new ReplyHandshake{static_cast<Method>(Settings::Inst().AuthMethod())});
-          yield _localSock->async_send(ba::buffer(_replyHandshake->GenBuff()), *this);
+          _replyBuff.reset(new std::vector<uint8_t>{_replyHandshake->GenBuff()});
+          yield _localSock->async_send(ba::buffer(*_replyBuff), *this);
           // ==================== Request/Reply Handshake ====================
 
           // ==================== Authentication ====================
@@ -62,12 +63,14 @@ namespace socks5
             if (_requestUnamePasswd->Uname() == Settings::Inst().Uname() && _requestUnamePasswd->Passwd() == Settings::Inst().Passwd())
             {
               _replyUnamePasswd.reset(new ReplyUnamePasswd{UNAME_PASSWD_SUCCESS});
-              yield _localSock->async_send(ba::buffer(_replyUnamePasswd->GenBuff()), *this);
+              _replyBuff.reset(new std::vector<uint8_t>{_replyUnamePasswd->GenBuff()});
+              yield _localSock->async_send(ba::buffer(*_replyBuff), *this);
             }
             else
             {
               _replyUnamePasswd.reset(new ReplyUnamePasswd{UNAME_PASSWD_FAILURE});
-              yield _localSock->async_send(ba::buffer(_replyUnamePasswd->GenBuff()), *this);
+              _replyBuff.reset(new std::vector<uint8_t>{_replyUnamePasswd->GenBuff()});
+              yield _localSock->async_send(ba::buffer(*_replyBuff), *this);
               _localSock->close();
               _localSock.reset();
               yield break;
@@ -79,11 +82,12 @@ namespace socks5
           yield _localSock->async_receive(ba::buffer(*_tempBuff), *this);
           _requestSocks.reset(new RequestSocks{*_tempBuff, length});
           
-          _resolver.reset(new ba::ip::tcp::resolver{_acceptor->get_io_context()});
+          _resolver.reset(new ba::ip::tcp::resolver{_acceptor->get_executor()});
           yield _resolver->async_resolve(_requestSocks->DstAddr(), _requestSocks->DstPort(), *this);
 
           _replySocks.reset(new ReplySocks{_serverEndpoint.address().to_v4().to_uint(), _serverEndpoint.port()});
-          yield _localSock->async_send(ba::buffer(_replySocks->GenBuff()), *this);
+          _replyBuff.reset(new std::vector<uint8_t>{_replySocks->GenBuff()});
+          yield _localSock->async_send(ba::buffer(*_replyBuff), *this);
           // ==================== Request/Reply Socks ====================
           
           _localBuff.reset(new std::array<uint8_t, BUFFER_SIZE>());
@@ -128,7 +132,7 @@ namespace socks5
     {
       reenter(_minorCoro)
       {
-        _remoteSock.reset(new ba::ip::tcp::socket{_acceptor->get_io_context()});
+        _remoteSock.reset(new ba::ip::tcp::socket{_acceptor->get_executor()});
         
         yield _remoteSock->async_connect(results.begin()->endpoint(), *this);
       }

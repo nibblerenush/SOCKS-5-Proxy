@@ -26,6 +26,7 @@ set(headers
   Version.hpp)
 
 set(Boost_USE_MULTITHREADED ON)
+set(Boost_USE_STATIC_LIBS ON)
 
 if(CMAKE_BUILD_TYPE MATCHES Debug)
   set(Boost_USE_DEBUG_LIBS ON)
@@ -39,7 +40,7 @@ find_package(Boost REQUIRED COMPONENTS system regex date_time log)
 find_package(Threads REQUIRED)
 
 if(${Boost_FOUND})
-  message("BOOST VERSION: " ${Boost_VERSION})
+  message("BOOST VERSION: " ${Boost_VERSION_STRING})
   message("BOOST INCLUDE DIR: " ${Boost_INCLUDE_DIRS})
   message("BOOST LIBRARIES DIR: " ${Boost_LIBRARY_DIRS})
   message("BOOST LIBRARIES: " ${Boost_LIBRARIES})
@@ -60,7 +61,9 @@ target_link_libraries(${PROJECT_NAME}
   Boost::log
   Threads::Threads)
 
-target_compile_definitions(${PROJECT_NAME} PRIVATE BOOST_LOG_DYN_LINK=1)
+#target_compile_definitions(${PROJECT_NAME} PRIVATE BOOST_ALL_DYN_LINK)
 if(WIN32)
-  target_compile_definitions(${PROJECT_NAME} PRIVATE _WIN32_WINNT=0x0501)
+  if(${Boost_VERSION_STRING} STREQUAL "1.71.0")
+    target_compile_definitions(${PROJECT_NAME} PRIVATE _WIN32_WINNT=0x0601)
+  endif()
 endif()

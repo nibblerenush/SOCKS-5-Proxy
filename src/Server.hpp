@@ -42,6 +42,7 @@ namespace socks5
     std::shared_ptr<std::array<uint8_t, BUFFER_SIZE>> _localBuff{nullptr};
     std::shared_ptr<std::array<uint8_t, BUFFER_SIZE>> _remoteBuff{nullptr};
     std::shared_ptr<std::vector<uint8_t>> _tempBuff{nullptr};
+    std::shared_ptr<std::vector<uint8_t>> _replyBuff{ nullptr };
 
     std::shared_ptr<RequestHandshake> _requestHandshake{nullptr};
     std::shared_ptr<ReplyHandshake> _replyHandshake{nullptr};
