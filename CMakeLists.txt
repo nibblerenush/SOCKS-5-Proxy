@@ -2,28 +2,28 @@ cmake_minimum_required(VERSION 3.0.0)
 project(SOCKS-5-Proxy)
 
 set(sources
-  Exception.cpp
-  ReplyHandshake.cpp
-  ReplySocks.cpp
-  ReplyUnamePasswd.cpp
-  RequestHandshake.cpp
-  RequestSocks.cpp
-  RequestUnamePasswd.cpp
-  Server.cpp
-  Settings.cpp
-  main.cpp)
+  src/Exception.cpp
+  src/ReplyHandshake.cpp
+  src/ReplySocks.cpp
+  src/ReplyUnamePasswd.cpp
+  src/RequestHandshake.cpp
+  src/RequestSocks.cpp
+  src/RequestUnamePasswd.cpp
+  src/Server.cpp
+  src/Settings.cpp
+  src/main.cpp)
 
 set(headers
-  Exception.hpp
-  ReplyHandshake.hpp
-  ReplySocks.hpp
-  ReplyUnamePasswd.hpp
-  RequestHandshake.hpp
-  RequestSocks.hpp
-  RequestUnamePasswd.hpp
-  Server.hpp
-  Settings.hpp
-  Version.hpp)
+  src/Exception.hpp
+  src/ReplyHandshake.hpp
+  src/ReplySocks.hpp
+  src/ReplyUnamePasswd.hpp
+  src/RequestHandshake.hpp
+  src/RequestSocks.hpp
+  src/RequestUnamePasswd.hpp
+  src/Server.hpp
+  src/Settings.hpp
+  src/Version.hpp)
 
 set(Boost_USE_MULTITHREADED ON)
 set(Boost_USE_STATIC_LIBS ON)
