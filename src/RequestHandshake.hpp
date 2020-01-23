@@ -11,6 +11,7 @@ namespace socks5
     NO_AUTHENTICATION_REQUIRED = 0x00,
     GSSAPI = 0x01,
     USERNAME_PASSWORD = 0x02,
+    LOGIN_HMAC = 0x03,
     /*
       From 0x03 to 0x7F IANA
       From 0x80 to 0xFE RESERVED FOR PRIVATE METHODS

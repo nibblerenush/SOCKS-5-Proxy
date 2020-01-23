@@ -1,0 +1,6 @@
+DROP TABLE IF EXISTS t_login_key;
+CREATE TABLE t_login_key
+(
+  id SERIAL PRIMARY KEY,
+  login VARCHAR(256) NOT NULL
+);

@@ -30,7 +30,8 @@ int main(int argc, char ** argv)
       }
     }
   );
-  
+
+  std::cout << "Server started" << std::endl;
   socks5::Server{ioContext, argv[1]}();
   ioContext.run();
   return EXIT_SUCCESS;

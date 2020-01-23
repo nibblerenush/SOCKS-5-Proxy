@@ -6,6 +6,7 @@
 #include "ReplySocks.hpp"
 #include "RequestUnamePasswd.hpp"
 #include "ReplyUnamePasswd.hpp"
+#include "RequestLogin.hpp"
 #include "Exception.hpp"
 
 #include <iostream>
@@ -75,6 +76,12 @@ namespace socks5
               _localSock.reset();
               yield break;
             }
+          }
+
+          if (static_cast<Method>(Settings::Inst().AuthMethod()) == LOGIN_HMAC)
+          {
+            yield _localSock->async_receive(ba::buffer(*_tempBuff), *this);
+            _requestLogin.reset(new RequestLogin{*_tempBuff, length});
           }
           // ==================== Authentication ====================
 

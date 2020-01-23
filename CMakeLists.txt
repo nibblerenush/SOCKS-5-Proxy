@@ -7,6 +7,7 @@ set(sources
   src/ReplySocks.cpp
   src/ReplyUnamePasswd.cpp
   src/RequestHandshake.cpp
+  src/RequestLogin.cpp
   src/RequestSocks.cpp
   src/RequestUnamePasswd.cpp
   src/Server.cpp
@@ -19,6 +20,7 @@ set(headers
   src/ReplySocks.hpp
   src/ReplyUnamePasswd.hpp
   src/RequestHandshake.hpp
+  src/RequestLogin.hpp
   src/RequestSocks.hpp
   src/RequestUnamePasswd.hpp
   src/Server.hpp

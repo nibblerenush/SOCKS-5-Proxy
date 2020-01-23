@@ -1,0 +1,12 @@
+{
+  "server":
+  {
+    "port": 11080,
+    "authentication_method": 3
+  },
+  "auth":
+  {
+    "login": "test_login",
+    "hmackey": "test_key"
+  }
+}
