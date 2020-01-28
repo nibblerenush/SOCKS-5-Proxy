@@ -37,4 +37,19 @@ namespace socks5
   {
     return _tree.get<std::string>("auth.passwd");
   }
+  
+  std::string Settings::Login() const
+  {
+    return _tree.get<std::string>("auth.login");
+  }
+  
+  std::vector<uint8_t> Settings::HmacKey() const
+  {
+    std::string hmacKeyString = _tree.get<std::string>("auth.hmackey");
+    std::vector<uint8_t> hmacKeyVector;
+    std::copy(hmacKeyString.begin(),
+              hmacKeyString.end(),
+              std::back_inserter(hmacKeyVector));
+    return hmacKeyVector;
+  }
 }

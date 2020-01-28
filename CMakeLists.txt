@@ -4,9 +4,12 @@ project(SOCKS-5-Proxy)
 set(sources
   src/Exception.cpp
   src/ReplyHandshake.cpp
+  src/ReplyHmac.cpp
+  src/ReplyLogin.cpp
   src/ReplySocks.cpp
   src/ReplyUnamePasswd.cpp
   src/RequestHandshake.cpp
+  src/RequestHmac.cpp
   src/RequestLogin.cpp
   src/RequestSocks.cpp
   src/RequestUnamePasswd.cpp
@@ -17,9 +20,12 @@ set(sources
 set(headers
   src/Exception.hpp
   src/ReplyHandshake.hpp
+  src/ReplyHmac.hpp
+  src/ReplyLogin.hpp
   src/ReplySocks.hpp
   src/ReplyUnamePasswd.hpp
   src/RequestHandshake.hpp
+  src/RequestHmac.hpp
   src/RequestLogin.hpp
   src/RequestSocks.hpp
   src/RequestUnamePasswd.hpp
@@ -48,6 +54,12 @@ if(${Boost_FOUND})
   message("BOOST LIBRARIES: " ${Boost_LIBRARIES})
 endif()
 
+find_package(OpenSSL REQUIRED)
+if(OPENSSL_FOUND)
+  message("OPENSSL_VERSION: " ${OPENSSL_VERSION})
+  message("OPENSSL_LIBRARIES: " ${OPENSSL_LIBRARIES})
+endif(OPENSSL_FOUND)
+
 if(${Threads_FOUND})
   message("CMAKE_THREAD_LIBS_INIT: " ${CMAKE_THREAD_LIBS_INIT})
 endif()
@@ -61,7 +73,10 @@ target_link_libraries(${PROJECT_NAME}
   Boost::regex
   Boost::date_time
   Boost::log
-  Threads::Threads)
+  Threads::Threads
+  OpenSSL::Crypto
+  OpenSSL::SSL
+  openssl-wrapper)
 
 #target_compile_definitions(${PROJECT_NAME} PRIVATE BOOST_ALL_DYN_LINK)
 if(WIN32)

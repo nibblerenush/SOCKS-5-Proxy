@@ -16,6 +16,9 @@ namespace socks5
   class RequestUnamePasswd;
   class ReplyUnamePasswd;
   class RequestLogin;
+  class ReplyLogin;
+  class RequestHmac;
+  class ReplyHmac;
 
   class Server
   {
@@ -43,7 +46,9 @@ namespace socks5
     std::shared_ptr<std::array<uint8_t, BUFFER_SIZE>> _localBuff{nullptr};
     std::shared_ptr<std::array<uint8_t, BUFFER_SIZE>> _remoteBuff{nullptr};
     std::shared_ptr<std::vector<uint8_t>> _tempBuff{nullptr};
-    std::shared_ptr<std::vector<uint8_t>> _replyBuff{ nullptr };
+    std::shared_ptr<std::vector<uint8_t>> _replyBuff{nullptr};
+
+    std::shared_ptr<std::vector<uint8_t>> _serverHmac;
 
     std::shared_ptr<RequestHandshake> _requestHandshake{nullptr};
     std::shared_ptr<ReplyHandshake> _replyHandshake{nullptr};
@@ -52,5 +57,8 @@ namespace socks5
     std::shared_ptr<RequestUnamePasswd> _requestUnamePasswd{nullptr};
     std::shared_ptr<ReplyUnamePasswd> _replyUnamePasswd{nullptr};
     std::shared_ptr<RequestLogin> _requestLogin{nullptr};
+    std::shared_ptr<ReplyLogin> _replyLogin{nullptr};
+    std::shared_ptr<RequestHmac> _requestHmac{nullptr};
+    std::shared_ptr<ReplyHmac> _replyHmac{nullptr};
   };
 }

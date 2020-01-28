@@ -2,6 +2,7 @@
 
 #include <cstdint>
 #include <string>
+#include <vector>
 
 #include <boost/property_tree/ptree.hpp>
 
@@ -17,6 +18,8 @@ namespace socks5
     uint8_t AuthMethod() const;
     std::string Uname() const;
     std::string Passwd() const;
+    std::string Login() const;
+    std::vector<uint8_t> HmacKey() const;
 
   private:
     explicit Settings() = default;
