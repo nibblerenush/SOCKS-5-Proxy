@@ -3,7 +3,7 @@ This is the simple socks5 proxy using [boost asio stackless coroutines](https://
 
 ## Dependencies
 * boost >= 1.71.0
-* openssl >= 1.0.2 (in future)
+* openssl >= 1.0.2
 
 ## Build
 ```cmake -DBOOST_INCLUDEDIR=<includedir> -DBOOST_LIBRARYDIR=<librarydir> <sources folder>```
