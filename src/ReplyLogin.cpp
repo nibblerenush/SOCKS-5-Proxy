@@ -18,9 +18,7 @@ namespace socks5
   _ver{LOGIN_HMAC_VER},
   _status{status},
   _randomStringLen{RANDOM_STRING_LENGTH}
-  {
-    //BOOST_LOG_TRIVIAL(info) << ToString();
-  }
+  {}
   
   std::vector<uint8_t> ReplyLogin::GenBuff()
   {

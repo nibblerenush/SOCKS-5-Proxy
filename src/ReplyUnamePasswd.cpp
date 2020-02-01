@@ -8,6 +8,9 @@
 
 namespace socks5
 {
+  const uint8_t ReplyUnamePasswd::SUCCESS = 0;
+  const uint8_t ReplyUnamePasswd::FAILURE = 1;
+
   ReplyUnamePasswd::ReplyUnamePasswd(uint8_t status)
   {
     _ver = UNAME_PASSWD_VER;

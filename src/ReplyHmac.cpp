@@ -8,6 +8,9 @@
 
 namespace socks5
 {
+  const uint8_t ReplyHmac::SUCCESS = 0;
+  const uint8_t ReplyHmac::FAILURE = 1;
+
   ReplyHmac::ReplyHmac(uint8_t status)
   {
     _ver = UNAME_PASSWD_VER;

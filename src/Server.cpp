@@ -13,15 +13,12 @@
 #include "Exception.hpp"
 
 #include <iostream>
-#include <openssl-wrapper/Hmac.h>
 #include <openssl-wrapper/BaseFunctions.h>
+#include <openssl-wrapper/Hmac.h>
 #include <openssl-wrapper/Initializer.h>
 
 namespace socks5
 {
-  static const uint8_t UNAME_PASSWD_SUCCESS = 0;
-  static const uint8_t UNAME_PASSWD_FAILURE = 1;
-
   Server::Server(ba::io_context & io_context, const std::string & filename):
   _majorCoro{},
   _minorCoro{},
@@ -62,7 +59,7 @@ namespace socks5
           yield _localSock->async_send(ba::buffer(*_replyBuff), *this);
           // ==================== Request/Reply Handshake ====================
 
-          // ==================== Authentication ====================
+          // ==================== USERNAME_PASSWORD ====================
           if (static_cast<Method>(Settings::Inst().AuthMethod()) == USERNAME_PASSWORD)
           {
             yield _localSock->async_receive(ba::buffer(*_tempBuff), *this);
@@ -70,13 +67,13 @@ namespace socks5
             
             if (_requestUnamePasswd->Uname() == Settings::Inst().Uname() && _requestUnamePasswd->Passwd() == Settings::Inst().Passwd())
             {
-              _replyUnamePasswd.reset(new ReplyUnamePasswd{UNAME_PASSWD_SUCCESS});
+              _replyUnamePasswd.reset(new ReplyUnamePasswd{ReplyUnamePasswd::SUCCESS});
               _replyBuff.reset(new std::vector<uint8_t>{_replyUnamePasswd->GenBuff()});
               yield _localSock->async_send(ba::buffer(*_replyBuff), *this);
             }
             else
             {
-              _replyUnamePasswd.reset(new ReplyUnamePasswd{UNAME_PASSWD_FAILURE});
+              _replyUnamePasswd.reset(new ReplyUnamePasswd{ReplyUnamePasswd::FAILURE});
               _replyBuff.reset(new std::vector<uint8_t>{_replyUnamePasswd->GenBuff()});
               yield _localSock->async_send(ba::buffer(*_replyBuff), *this);
               _localSock->close();
@@ -84,7 +81,9 @@ namespace socks5
               yield break;
             }
           }
-          
+          // ==================== USERNAME_PASSWORD ====================
+
+          // ==================== LOGIN_HMAC ====================
           if (static_cast<Method>(Settings::Inst().AuthMethod()) == LOGIN_HMAC)
           {
             yield _localSock->async_receive(ba::buffer(*_tempBuff), *this);
@@ -108,33 +107,33 @@ namespace socks5
             yield _localSock->async_receive(ba::buffer(*_tempBuff), *this);
             _requestHmac.reset(new RequestHmac(*_tempBuff, length));
 
-            _serverHmac.reset(new std::vector<uint8_t>(openssl_wrapper::Hmac::GetMac("SHA256", _replyLogin->RandomString(), Settings::Inst().HmacKey())));
-
-
             using namespace openssl_wrapper;
+            _serverHmac.reset(new std::vector<uint8_t>(Hmac::GetMac("SHA256",
+                                                                    _replyLogin->RandomString(),
+                                                                    Settings::Inst().HmacKey())));
             
-            std::cout << BaseFunctions::GetHexString(_requestHmac->Hmac()) << ' ' << _requestHmac->Hmac().size() << std::endl;
-            std::cout << BaseFunctions::GetHexString(*_serverHmac) << ' ' << _serverHmac->size() << std::endl;
+            std::cout << BaseFunctions::GetHexString(_requestHmac->Hmac())
+              << ' ' << _requestHmac->Hmac().size() << std::endl;
+            std::cout << BaseFunctions::GetHexString(*_serverHmac)
+              << ' ' << _serverHmac->size() << std::endl;
 
             if (std::equal(_serverHmac->begin(), _serverHmac->end(), _requestHmac->Hmac().begin()))
             {
-              _replyHmac.reset(new ReplyHmac{UNAME_PASSWD_SUCCESS});
+              _replyHmac.reset(new ReplyHmac{ReplyHmac::SUCCESS});
               _replyBuff.reset(new std::vector<uint8_t>{_replyHmac->GenBuff()});
               yield _localSock->async_send(ba::buffer(*_replyBuff), *this);
             }
             else
             {
-              _replyHmac.reset(new ReplyHmac{UNAME_PASSWD_FAILURE});
+              _replyHmac.reset(new ReplyHmac{ReplyHmac::FAILURE});
               _replyBuff.reset(new std::vector<uint8_t>{_replyHmac->GenBuff()});
               yield _localSock->async_send(ba::buffer(*_replyBuff), *this);
               _localSock->close();
               _localSock.reset();
               yield break;
             }
-
-            
           }
-          // ==================== Authentication ====================
+          // ==================== LOGIN_HMAC ====================
 
           // ==================== Request/Reply Socks ====================
           yield _localSock->async_receive(ba::buffer(*_tempBuff), *this);
